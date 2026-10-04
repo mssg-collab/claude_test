@@ -221,7 +221,14 @@ footer { font-size: 12px; color: var(--muted); }
     $("highlights").hidden = hl.length === 0;
     $("hlList").replaceChildren(...hl.map((h) => el("li", {}, str(h))));
 
-    const sections = arr(b.topics).map((t) => ({ name: str(t.name), focus: str(t.focus), items: arr(t.items).filter(matches) }));
+    // Topics from settings come first (so newly added ones show up), then any extra topics the brief carried.
+    const briefTopics = new Map(arr(b.topics).map((t) => [str(t.name), t]));
+    const names = [...state.topics.map((t) => t.name), ...briefTopics.keys()].filter((n, i, all) => all.indexOf(n) === i);
+    const sections = names.map((name) => {
+      const t = briefTopics.get(name);
+      const cfg = state.topics.find((c) => c.name === name);
+      return { name, focus: str((t && t.focus) || (cfg && cfg.focus)), collected: !!t, items: t ? arr(t.items).filter(matches) : [] };
+    });
 
     // Topic chips
     const total = sections.reduce((s, t) => s + t.items.length, 0);
@@ -239,7 +246,9 @@ footer { font-size: 12px; color: var(--muted); }
       const sec = el("section", { class: "section", style: "--c:" + color },
         el("div", { class: "section-head" }, el("h2", {}, s.name), s.focus ? el("span", { class: "focus" }, s.focus) : null));
       if (!s.items.length) {
-        sec.append(el("div", { class: "empty" }, el("span", {}, state.q ? "このキーワードに合う記事はありません。" : "この日は目立った動きがありませんでした。")));
+        sec.append(el("div", { class: "empty" }, el("span", {},
+          !s.collected ? "このトピックは、この日の収集後に追加されました。次の朝の収集から記事が並びます。"
+          : state.q ? "このキーワードに合う記事はありません。" : "この日は目立った動きがありませんでした。")));
       }
       for (const it of s.items) { any = true; sec.append(card(b.date || state.selectedDate, s.name, it, color)); }
       content.append(sec);
