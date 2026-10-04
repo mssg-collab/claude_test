@@ -1,0 +1,324 @@
+<title>Morning Intel Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+Antique:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: briefing sheet — masthead with date rail, topic switcher, single reading column of dossier cards */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --ink: #17202b;
+  --muted: #5b6776;
+  --line: #d5dbe2;
+  --accent: #1f4e8c;
+  --accent-soft: #e3ebf6;
+  --signal: #b5651d;
+  --signal-soft: #f7ecdf;
+  --t1: #3b5bdb; --t2: #2b8a6e; --t3: #a3477a; --t4: #c26a14; --t5: #6a4fc4; --t6: #1c7c9c; --t7: #7a6a1f; --t8: #b03a3a;
+  --font-display: "Zen Kaku Gothic Antique", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d; --surface: #19212b; --ink: #e6ebf1; --muted: #9aa6b4; --line: #2b3542;
+    --accent: #7fa7e0; --accent-soft: #1d2a3c; --signal: #e0a062; --signal-soft: #2e2418;
+    --t1: #8ea5ff; --t2: #6cc7a9; --t3: #e08bbb; --t4: #f0a85a; --t5: #b39cf5; --t6: #6ec3df; --t7: #d6c46a; --t8: #f08a8a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161d; --surface: #19212b; --ink: #e6ebf1; --muted: #9aa6b4; --line: #2b3542;
+  --accent: #7fa7e0; --accent-soft: #1d2a3c; --signal: #e0a062; --signal-soft: #2e2418;
+  --t1: #8ea5ff; --t2: #6cc7a9; --t3: #e08bbb; --t4: #f0a85a; --t5: #b39cf5; --t6: #6ec3df; --t7: #d6c46a; --t8: #f08a8a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.75; }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 22px; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Masthead */
+.mast { display: grid; gap: 10px; }
+.mast-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(26px, 5vw, 36px); line-height: 1.2; margin: 0; text-wrap: balance; }
+h1 .date { color: var(--accent); font-variant-numeric: tabular-nums; }
+.meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+select, input[type="search"] { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 0; }
+input[type="search"] { flex: 1 1 200px; }
+.btn { font: inherit; font-size: 13px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+
+/* Highlights */
+.highlights { background: var(--signal-soft); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 6px; }
+.highlights h2 { font-family: var(--font-display); font-size: 15px; margin: 0; color: var(--signal); letter-spacing: .04em; }
+.highlights ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+
+/* Topic switcher */
+.topics { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--muted)); }
+.chip .n { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { border-color: var(--c, var(--accent)); box-shadow: inset 0 0 0 1px var(--c, var(--accent)); font-weight: 700; }
+
+/* Sections and cards */
+.section { display: grid; gap: 12px; }
+.section-head { display: flex; align-items: baseline; gap: 10px; border-bottom: 2px solid var(--c, var(--line)); padding-bottom: 6px; }
+.section-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 0; }
+.section-head .focus { font-size: 12px; color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.card.read { opacity: .72; }
+.card-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); align-items: center; }
+.card-meta .src { font-weight: 700; color: var(--ink); }
+.card-meta .pub { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tag { font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+.card h3 { font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1.45; margin: 0; text-wrap: balance; overflow-wrap: anywhere; }
+.card h3 a { color: var(--ink); text-decoration: none; }
+.card h3 a:hover { color: var(--accent); text-decoration: underline; }
+.label { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+.summary { margin: 0; overflow-wrap: anywhere; }
+.points { margin: 0; padding-left: 1.2em; display: grid; gap: 2px; }
+.implication { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; }
+.implication .label { color: var(--accent); }
+details { border-top: 1px dashed var(--line); padding-top: 8px; }
+summary { cursor: pointer; font-size: 13px; color: var(--accent); font-weight: 700; }
+.detail-body { display: grid; gap: 10px; padding-top: 8px; overflow-wrap: anywhere; }
+.detail-body p { margin: 0; white-space: pre-line; }
+.refs { margin: 0; padding-left: 1.2em; font-size: 13px; }
+.card-foot { display: flex; justify-content: flex-end; }
+.linkbtn { font: inherit; font-size: 12px; background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px 0; }
+.linkbtn:hover { color: var(--accent); }
+
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); padding: 28px 20px; text-align: center; color: var(--muted); display: grid; gap: 6px; }
+.empty strong { color: var(--ink); font-family: var(--font-display); font-size: 17px; }
+
+/* Settings */
+.settings { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 10px; }
+.settings h2 { font-family: var(--font-display); font-size: 17px; margin: 0; }
+.settings p { margin: 0; font-size: 13px; color: var(--muted); }
+textarea { font-family: var(--font-mono); font-size: 13px; line-height: 1.6; width: 100%; min-height: 180px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+.status { font-size: 12px; color: var(--muted); }
+footer { font-size: 12px; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { .card { transition: opacity .2s; } }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="mast-top">
+      <span class="eyebrow">Morning Intel Brief · 毎朝 7:00 更新</span>
+      <span class="meta" id="genAt"></span>
+    </div>
+    <h1><span class="date" id="dateTitle">—</span> の先回りインテリジェンス</h1>
+    <div class="controls">
+      <label for="dateSel" class="label">日付</label>
+      <select id="dateSel" aria-label="表示する日付"><option>読み込み中…</option></select>
+      <input type="search" id="q" placeholder="キーワードで絞り込み（例：エージェント, Salesforce）" aria-label="キーワード検索">
+      <button class="btn" id="settingsBtn" type="button" hidden>トピック設定</button>
+    </div>
+  </header>
+
+  <section class="settings" id="settings" hidden>
+    <h2>収集トピック</h2>
+    <p>1行に1トピック。「トピック名 | 重点キーワード」の形式です。保存すると、翌朝の収集から反映されます。</p>
+    <textarea id="topicsText" aria-label="トピック一覧"></textarea>
+    <div class="controls">
+      <button class="btn primary" id="saveTopics" type="button">保存</button>
+      <button class="btn" id="closeSettings" type="button">閉じる</button>
+      <span class="status" id="settingsStatus"></span>
+    </div>
+  </section>
+
+  <section class="highlights" id="highlights" hidden>
+    <h2>今朝の要点</h2>
+    <ul id="hlList"></ul>
+  </section>
+
+  <nav class="topics" id="topicNav" aria-label="トピック"></nav>
+
+  <main id="content" class="wrap" style="padding:0">
+    <div class="empty">
+      <strong>今朝のブリーフを読み込んでいます</strong>
+      <span>毎朝 7:00 に AI・コンサルティング・チェンジマネジメント・CRM・CX・デジタルマーケティングの最新動向がここに並びます。</span>
+    </div>
+  </main>
+
+  <footer>収集・要約は Claude が自動で行っています。重要な判断の前には、各記事の参照元で原文を確認してください。</footer>
+</div>
+
+<script>
+(function () {
+  const DEFAULT_TOPICS = [
+    { name: "AI", focus: "生成AI, AIエージェント, エンタープライズAI導入, AIガバナンス・規制" },
+    { name: "コンサルティング", focus: "大手ファームの動向, 業界レポート, 価格・提供モデルの変化" },
+    { name: "チェンジマネジメント", focus: "DX定着化, 組織変革, AI時代の人材・リスキリング" },
+    { name: "CRM", focus: "Salesforce, Microsoft Dynamics, HubSpot, SAP, CRMのAI機能" },
+    { name: "CX", focus: "顧客体験, コンタクトセンター, VoC, パーソナライゼーション" },
+    { name: "デジタルマーケティング", focus: "MA, CDP, 広告・Cookie規制, 生成AI活用マーケティング" }
+  ];
+  const TOPIC_COLORS = ["--t1", "--t2", "--t3", "--t4", "--t5", "--t6", "--t7", "--t8"];
+
+  const $ = (id) => document.getElementById(id);
+  const state = { dates: [], briefs: new Map(), selectedDate: null, topic: "all", q: "", topics: DEFAULT_TOPICS, read: loadRead() };
+
+  function loadRead() { try { return new Set(JSON.parse(localStorage.getItem("mib.read") || "[]")); } catch (e) { return new Set(); } }
+  function saveRead() { try { localStorage.setItem("mib.read", JSON.stringify([...state.read].slice(-2000))); } catch (e) {} }
+  function el(tag, attrs, ...kids) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") n.className = v; else if (k === "style") n.style.cssText = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v);
+    }
+    for (const c of kids.flat()) if (c != null && c !== false) n.append(c.nodeType ? c : String(c));
+    return n;
+  }
+  const safeUrl = (u) => (typeof u === "string" && /^https?:\/\//i.test(u)) ? u : null;
+  const str = (v) => (typeof v === "string" ? v : v == null ? "" : String(v));
+  const arr = (v) => (Array.isArray(v) ? v : []);
+
+  function topicColor(name) {
+    const i = state.topics.findIndex((t) => t.name === name);
+    return "var(" + TOPIC_COLORS[(i < 0 ? state.topics.length : i) % TOPIC_COLORS.length] + ")";
+  }
+  function itemKey(date, topic, item) { return date + "|" + topic + "|" + str(item.url || item.title); }
+
+  function currentBrief() { return state.selectedDate ? state.briefs.get(state.selectedDate) : null; }
+
+  function matches(item) {
+    if (!state.q) return true;
+    const hay = [item.title, item.summary, item.detail, item.implication, arr(item.points).join(" "), arr(item.tags).join(" "), item.source && item.source.name].map(str).join(" ").toLowerCase();
+    return state.q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
+  }
+
+  function render() {
+    const b = currentBrief();
+    const content = $("content");
+    content.replaceChildren();
+    $("dateTitle").textContent = state.selectedDate || "—";
+    $("genAt").textContent = b && b.generatedAt ? "生成 " + new Date(b.generatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", hour12: false }) : "";
+
+    // Date selector
+    const sel = $("dateSel");
+    sel.replaceChildren(...(state.dates.length ? state.dates : ["—"]).map((d) => el("option", { value: d, selected: d === state.selectedDate ? "" : null }, d)));
+
+    if (!b) {
+      $("highlights").hidden = true;
+      $("topicNav").replaceChildren();
+      content.append(el("div", { class: "empty" },
+        el("strong", {}, state.dbMissing ? "データベースに接続できません" : "まだブリーフがありません"),
+        el("span", {}, state.dbMissing
+          ? "サインインした状態でこのページを開いてください。"
+          : "毎朝 7:00 に最初のブリーフが届きます。届くと、トピック別の記事・要約・ポイントがここに表示されます。")));
+      return;
+    }
+
+    // Highlights
+    const hl = arr(b.highlights);
+    $("highlights").hidden = hl.length === 0;
+    $("hlList").replaceChildren(...hl.map((h) => el("li", {}, str(h))));
+
+    const sections = arr(b.topics).map((t) => ({ name: str(t.name), focus: str(t.focus), items: arr(t.items).filter(matches) }));
+
+    // Topic chips
+    const total = sections.reduce((s, t) => s + t.items.length, 0);
+    const chip = (key, label, n, color) => el("button", {
+      class: "chip", type: "button", "aria-pressed": String(state.topic === key), style: color ? "--c:" + color : null,
+      onclick: () => { state.topic = key; try { localStorage.setItem("mib.topic", key); } catch (e) {} render(); }
+    }, el("span", { class: "dot" }), label, el("span", { class: "n" }, n));
+    $("topicNav").replaceChildren(chip("all", "すべて", total, null), ...sections.map((s) => chip(s.name, s.name, s.items.length, topicColor(s.name))));
+
+    const shown = sections.filter((s) => state.topic === "all" || s.name === state.topic);
+    if (!shown.length && state.topic !== "all") { state.topic = "all"; return render(); }
+    let any = false;
+    for (const s of shown) {
+      const color = topicColor(s.name);
+      const sec = el("section", { class: "section", style: "--c:" + color },
+        el("div", { class: "section-head" }, el("h2", {}, s.name), s.focus ? el("span", { class: "focus" }, s.focus) : null));
+      if (!s.items.length) {
+        sec.append(el("div", { class: "empty" }, el("span", {}, state.q ? "このキーワードに合う記事はありません。" : "この日は目立った動きがありませんでした。")));
+      }
+      for (const it of s.items) { any = true; sec.append(card(b.date || state.selectedDate, s.name, it, color)); }
+      content.append(sec);
+    }
+    if (!any && state.q) content.prepend(el("div", { class: "empty" }, el("strong", {}, "該当する記事がありません"), el("span", {}, "キーワードを変えるか、別の日付を選んでください。")));
+  }
+
+  function card(date, topicName, it, color) {
+    const key = itemKey(date, topicName, it);
+    const isRead = state.read.has(key);
+    const src = it.source || {};
+    const url = safeUrl(it.url) || safeUrl(src.url);
+    const refs = arr(it.references).filter((r) => r && safeUrl(r.url));
+    const c = el("article", { class: "card" + (isRead ? " read" : "") },
+      el("div", { class: "card-meta" },
+        el("span", { class: "src" }, str(src.name) || "出典不明"),
+        it.published ? el("span", { class: "pub" }, str(it.published)) : null,
+        ...arr(it.tags).slice(0, 4).map((t) => el("span", { class: "tag", style: "border-color:" + color + ";color:" + color }, str(t)))),
+      el("h3", {}, url ? el("a", { href: url, target: "_blank", rel: "noopener" }, str(it.title)) : str(it.title)),
+      it.summary ? el("div", {}, el("div", { class: "label" }, "要約"), el("p", { class: "summary" }, str(it.summary))) : null,
+      arr(it.points).length ? el("div", {}, el("div", { class: "label" }, "ポイント"), el("ul", { class: "points" }, arr(it.points).map((p) => el("li", {}, str(p))))) : null,
+      it.implication ? el("div", { class: "implication" }, el("div", { class: "label" }, "顧客への示唆・打ち手"), el("div", {}, str(it.implication))) : null,
+      (it.detail || refs.length || url) ? el("details", {},
+        el("summary", {}, "詳細と参照元"),
+        el("div", { class: "detail-body" },
+          it.detail ? el("p", {}, str(it.detail)) : null,
+          el("div", {}, el("div", { class: "label" }, "参照元"),
+            el("ul", { class: "refs" },
+              url ? el("li", {}, el("a", { href: url, target: "_blank", rel: "noopener" }, str(src.name) || url)) : null,
+              refs.map((r) => el("li", {}, el("a", { href: r.url, target: "_blank", rel: "noopener" }, str(r.name) || r.url))))))) : null,
+      el("div", { class: "card-foot" }, el("button", { class: "linkbtn", type: "button", onclick: () => {
+        if (state.read.has(key)) state.read.delete(key); else state.read.add(key);
+        saveRead(); render();
+      } }, isRead ? "未読に戻す" : "既読にする")));
+    return c;
+  }
+
+  // Controls
+  $("dateSel").addEventListener("change", (e) => { state.selectedDate = e.target.value; render(); });
+  let qTimer; $("q").addEventListener("input", (e) => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = e.target.value.trim(); render(); }, 150); });
+  try { state.topic = localStorage.getItem("mib.topic") || "all"; } catch (e) {}
+
+  function topicsToText(ts) { return ts.map((t) => t.focus ? t.name + " | " + t.focus : t.name).join("\n"); }
+  function textToTopics(s) {
+    return s.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => { const [n, ...rest] = l.split("|"); return { name: n.trim(), focus: rest.join("|").trim() }; }).filter((t) => t.name).slice(0, 12);
+  }
+
+  (async function boot() {
+    const db = await (window.claude && window.claude.use ? window.claude.use("db") : null);
+    if (!db) { state.dbMissing = true; render(); return; }
+    const user = await window.claude.use("user");
+
+    db.collection("briefs").orderBy("date", "desc").limit(60).onSnapshot((snap) => {
+      state.briefs = new Map(snap.docs.map((d) => [str(d.data().date || d.id), d.data()]));
+      state.dates = [...state.briefs.keys()];
+      if (!state.selectedDate || !state.briefs.has(state.selectedDate)) state.selectedDate = state.dates[0] || null;
+      render();
+    }, () => { state.dbMissing = true; render(); });
+
+    const cfgRef = db.doc("config/topics");
+    cfgRef.onSnapshot((snap) => {
+      const ts = snap.exists ? arr(snap.data().topics).filter((t) => t && t.name) : [];
+      state.topics = ts.length ? ts : DEFAULT_TOPICS;
+      if ($("settings").hidden) $("topicsText").value = topicsToText(state.topics);
+      render();
+    });
+
+    if (user && user.isOwner()) {
+      $("settingsBtn").hidden = false;
+      $("settingsBtn").addEventListener("click", () => { $("topicsText").value = topicsToText(state.topics); $("settingsStatus").textContent = ""; $("settings").hidden = false; });
+      $("closeSettings").addEventListener("click", () => { $("settings").hidden = true; });
+      $("saveTopics").addEventListener("click", async () => {
+        const ts = textToTopics($("topicsText").value);
+        if (!ts.length) { $("settingsStatus").textContent = "トピックを1つ以上入力してください。"; return; }
+        $("settingsStatus").textContent = "保存中…";
+        try { await cfgRef.set({ topics: ts, updatedAt: new Date().toISOString() }); $("settingsStatus").textContent = "保存しました。翌朝の収集から反映されます。"; }
+        catch (e) { $("settingsStatus").textContent = "保存できませんでした（" + (e && e.code || "error") + "）。時間をおいてもう一度試してください。"; }
+      });
+    }
+  })();
+})();
+</script>
