@@ -11,8 +11,7 @@ private class AccountInsightsControllerTest {
             Rating = 'Hot',
             AnnualRevenue = 5000000000.0,
             NumberOfEmployees = 1200,
-            BillingState = '東京都',
-            BillingCity = '千代田区'
+            BillingCity = '東京都千代田区'
         );
         insert acc;
         insert new Account(Name = '空の取引先');

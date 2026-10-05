@@ -24,8 +24,7 @@ Account acc = new Account(
     Rating = 'Hot',
     AnnualRevenue = 18000000000.0,
     NumberOfEmployees = 2400,
-    BillingState = '東京都',
-    BillingCity = '港区',
+    BillingCity = '東京都港区',
     Website = 'https://example.com',
     Phone = '03-0000-0000'
 );
