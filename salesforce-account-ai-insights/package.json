@@ -1,0 +1,23 @@
+{
+  "name": "account-ai-insights",
+  "private": true,
+  "version": "1.0.0",
+  "description": "取引先レコードページ用 AI 風サマリー / ネクストアクション LWC（デモ）",
+  "scripts": {
+    "lint": "eslint force-app/main/default/lwc",
+    "test:unit": "sfdx-lwc-jest",
+    "prettier:apex": "prettier --plugin=prettier-plugin-apex --check \"force-app/**/*.cls\""
+  },
+  "devDependencies": {
+    "@lwc/eslint-plugin-lwc": "^2.0.0",
+    "@salesforce/eslint-config-lwc": "^3.6.0",
+    "@salesforce/eslint-plugin-lightning": "^1.0.0",
+    "@salesforce/sfdx-lwc-jest": "^5.1.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^28.6.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-apex": "^2.1.4",
+    "typescript": "^5.9.3"
+  }
+}

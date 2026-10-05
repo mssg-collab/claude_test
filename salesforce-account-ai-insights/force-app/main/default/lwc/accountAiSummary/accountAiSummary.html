@@ -1,0 +1,227 @@
+<template>
+    <article class="card">
+        <header class="header">
+            <div class="header__orb header__orb_1"></div>
+            <div class="header__orb header__orb_2"></div>
+            <div class="header__main">
+                <span class="header__icon">
+                    <lightning-icon icon-name="utility:einstein" size="small" variant="inverse"></lightning-icon>
+                </span>
+                <div class="header__text">
+                    <h2 class="header__title">AI 取引先サマリー</h2>
+                    <p class="header__subtitle">{subtitle}</p>
+                </div>
+            </div>
+            <div class="header__actions">
+                <span class="badge-ai">AI 生成</span>
+                <lightning-button-icon
+                    icon-name="utility:refresh"
+                    variant="bare-inverse"
+                    alternative-text="再生成"
+                    title="再生成"
+                    onclick={handleRegenerate}
+                    disabled={isLoading}
+                ></lightning-button-icon>
+            </div>
+        </header>
+
+        <div class="body">
+            <template lwc:if={isLoading}>
+                <div class="loading">
+                    <div class="loading__orb">
+                        <span class="loading__ring"></span>
+                        <lightning-icon icon-name="utility:einstein" size="medium" class="loading__icon"></lightning-icon>
+                    </div>
+                    <p class="loading__title">AI が取引先の情報を分析しています…</p>
+                    <ul class="steps">
+                        <template for:each={loadingSteps} for:item="step">
+                            <li key={step.key} class={step.cls}>
+                                <span class="step__mark">
+                                    <template lwc:if={step.isDone}>
+                                        <lightning-icon icon-name="utility:check" size="xx-small" variant="inverse"></lightning-icon>
+                                    </template>
+                                </span>
+                                {step.label}
+                            </li>
+                        </template>
+                    </ul>
+                    <div class="skeleton">
+                        <span class="skeleton__line skeleton__line_lg"></span>
+                        <span class="skeleton__line"></span>
+                        <span class="skeleton__line skeleton__line_sm"></span>
+                    </div>
+                </div>
+            </template>
+
+            <template lwc:elseif={error}>
+                <div class="error">
+                    <lightning-icon icon-name="utility:warning" size="small" variant="warning"></lightning-icon>
+                    <div>
+                        <p class="error__title">サマリーを生成できませんでした</p>
+                        <p class="error__message">{error}</p>
+                    </div>
+                </div>
+            </template>
+
+            <template lwc:elseif={hasData}>
+                <!-- ヘルススコア & ヘッドライン -->
+                <section class={heroClass}>
+                    <div class="health">
+                        <svg class="health__svg" viewBox="0 0 120 120" aria-hidden="true">
+                            <circle class="health__track" cx="60" cy="60" r="52"></circle>
+                            <circle
+                                class="health__arc"
+                                cx="60"
+                                cy="60"
+                                r="52"
+                                stroke-dasharray={ringCircumference}
+                                stroke-dashoffset={ringOffset}
+                            ></circle>
+                        </svg>
+                        <div class="health__center">
+                            <span class="health__score">{displayScore}</span>
+                            <span class="health__caption">ヘルススコア</span>
+                        </div>
+                    </div>
+                    <div class="hero__text">
+                        <span class="hero__status">
+                            <span class="hero__status-dot"></span>
+                            {data.healthLabel}
+                        </span>
+                        <p class="hero__name">{data.accountName}</p>
+                        <template lwc:if={data.profileLine}>
+                            <p class="hero__profile">{data.profileLine}</p>
+                        </template>
+                        <p class="hero__headline">{data.headline}</p>
+                        <div class="tags">
+                            <template for:each={tagItems} for:item="tag">
+                                <span key={tag.key} class="tag">{tag.label}</span>
+                            </template>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI 要約 -->
+                <section class="narrative" onclick={handleSkipTyping}>
+                    <div class="narrative__head">
+                        <span class="section-label">
+                            <lightning-icon icon-name="utility:einstein" size="xx-small" class="section-label__icon"></lightning-icon>
+                            AI による要約
+                        </span>
+                        <button class="text-button" type="button" onclick={handleCopy}>{copyLabel}</button>
+                    </div>
+                    <p class={narrativeClass}>{displayedNarrative}</p>
+                </section>
+
+                <!-- KPI -->
+                <section class="kpis">
+                    <template for:each={kpiItems} for:item="kpi">
+                        <div key={kpi.key} class={kpi.cls} style={kpi.style}>
+                            <div class="kpi__head">
+                                <span class="kpi__icon">
+                                    <lightning-icon icon-name={kpi.icon} size="x-small"></lightning-icon>
+                                </span>
+                                <span class="kpi__label">{kpi.label}</span>
+                            </div>
+                            <p class="kpi__value">{kpi.value}</p>
+                            <p class="kpi__sub">{kpi.subText}</p>
+                        </div>
+                    </template>
+                </section>
+
+                <div class="grid">
+                    <!-- インサイト -->
+                    <section class="panel">
+                        <h3 class="panel__title">注目すべきシグナル</h3>
+                        <ul class="insights">
+                            <template for:each={insightItems} for:item="insight">
+                                <li key={insight.key} class={insight.cls} style={insight.style}>
+                                    <span class="insight__icon">
+                                        <lightning-icon icon-name={insight.icon} size="xx-small" variant="inverse"></lightning-icon>
+                                    </span>
+                                    <div>
+                                        <p class="insight__title">{insight.title}</p>
+                                        <p class="insight__detail">{insight.detail}</p>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </section>
+
+                    <!-- パイプライン -->
+                    <section class="panel">
+                        <h3 class="panel__title">フェーズ別パイプライン</h3>
+                        <template lwc:if={hasStageBars}>
+                            <ul class="stages">
+                                <template for:each={stageItems} for:item="bar">
+                                    <li key={bar.key} class="stage">
+                                        <div class="stage__row">
+                                            <span class="stage__name">{bar.stage}</span>
+                                            <span class="stage__meta">{bar.count}件 · {bar.amountLabel}</span>
+                                        </div>
+                                        <div class="stage__track">
+                                            <span class="stage__fill" style={bar.barStyle}></span>
+                                        </div>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template lwc:else>
+                            <p class="empty">進行中の商談はありません。</p>
+                        </template>
+                    </section>
+
+                    <!-- キーパーソン -->
+                    <section class="panel">
+                        <h3 class="panel__title">キーパーソン</h3>
+                        <template lwc:if={hasContacts}>
+                            <ul class="contacts">
+                                <template for:each={contactItems} for:item="c">
+                                    <li key={c.id} class="contact">
+                                        <span class="contact__avatar" style={c.avatarStyle}>{c.initials}</span>
+                                        <div class="contact__body">
+                                            <p class="contact__name">{c.name}</p>
+                                            <p class="contact__title">{c.title}</p>
+                                        </div>
+                                        <span class={c.touchCls}>{c.lastTouchLabel}</span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template lwc:else>
+                            <p class="empty">取引先責任者が登録されていません。</p>
+                        </template>
+                    </section>
+
+                    <!-- タイムライン -->
+                    <section class="panel">
+                        <h3 class="panel__title">最近の動き</h3>
+                        <template lwc:if={hasTimeline}>
+                            <ul class="timeline">
+                                <template for:each={timelineItems} for:item="t">
+                                    <li key={t.id} class="timeline__item">
+                                        <span class={t.dotCls}>
+                                            <lightning-icon icon-name={t.icon} size="xx-small" variant="inverse"></lightning-icon>
+                                        </span>
+                                        <div class="timeline__body">
+                                            <p class="timeline__title">{t.title}</p>
+                                            <p class="timeline__sub">{t.dateLabel} · {t.subtitle}</p>
+                                        </div>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template lwc:else>
+                            <p class="empty">記録された活動はまだありません。</p>
+                        </template>
+                    </section>
+                </div>
+
+                <footer class="footer">
+                    <lightning-icon icon-name="utility:info" size="xx-small"></lightning-icon>
+                    この内容は Salesforce 内のデータからデモ用に自動生成されたものです。重要な判断の前に元データをご確認ください。
+                </footer>
+            </template>
+        </div>
+    </article>
+</template>

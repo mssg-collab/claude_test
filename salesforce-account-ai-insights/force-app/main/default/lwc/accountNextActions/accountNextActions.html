@@ -1,0 +1,200 @@
+<template>
+    <article class="card">
+        <header class="header">
+            <div class="header__orb"></div>
+            <div class="header__main">
+                <span class="header__icon">
+                    <lightning-icon icon-name="utility:einstein" size="small" variant="inverse"></lightning-icon>
+                </span>
+                <div>
+                    <h2 class="header__title">AI ネクストアクション</h2>
+                    <p class="header__subtitle">{subtitle}</p>
+                </div>
+            </div>
+            <lightning-button-icon
+                icon-name="utility:refresh"
+                variant="bare-inverse"
+                alternative-text="提案を更新"
+                title="提案を更新"
+                onclick={handleRefresh}
+                disabled={isLoading}
+            ></lightning-button-icon>
+        </header>
+
+        <div class="body">
+            <template lwc:if={isLoading}>
+                <p class="thinking">
+                    <span class="thinking__dots"><span></span><span></span><span></span></span>
+                    AI が取引先の状況から次の一手を検討しています
+                </p>
+                <ul class="skeletons">
+                    <li class="skeleton"><span class="skeleton__circle"></span><span class="skeleton__lines"><span></span><span></span></span></li>
+                    <li class="skeleton"><span class="skeleton__circle"></span><span class="skeleton__lines"><span></span><span></span></span></li>
+                    <li class="skeleton"><span class="skeleton__circle"></span><span class="skeleton__lines"><span></span><span></span></span></li>
+                </ul>
+            </template>
+
+            <template lwc:elseif={error}>
+                <div class="error">
+                    <lightning-icon icon-name="utility:warning" size="small" variant="warning"></lightning-icon>
+                    <div>
+                        <p class="error__title">提案を生成できませんでした</p>
+                        <p class="error__message">{error}</p>
+                    </div>
+                </div>
+            </template>
+
+            <template lwc:elseif={hasResult}>
+                <div class="overview">
+                    <p class="overview__headline">
+                        <lightning-icon icon-name="utility:einstein" size="x-small" class="overview__icon"></lightning-icon>
+                        <span>{result.headline}</span>
+                    </p>
+                    <div class="progress">
+                        <div class="progress__track">
+                            <span class="progress__fill" style={progressStyle}></span>
+                        </div>
+                        <span class="progress__label">{handledCount} / {totalCount} 件 対応済み</span>
+                    </div>
+                </div>
+
+                <div class="filters" role="group" aria-label="優先度で絞り込み">
+                    <template for:each={filterOptions} for:item="f">
+                        <button
+                            key={f.value}
+                            type="button"
+                            class={f.cls}
+                            data-value={f.value}
+                            aria-pressed={f.pressed}
+                            onclick={handleFilter}
+                        >
+                            {f.label}
+                            <span class="filter__count">{f.count}</span>
+                        </button>
+                    </template>
+                </div>
+
+                <template lwc:if={isAllHandled}>
+                    <div class="celebrate">
+                        <span class="celebrate__icon">🎉</span>
+                        <div>
+                            <p class="celebrate__title">すべての提案に対応しました</p>
+                            <p class="celebrate__text">新しい活動が登録されたら「提案を更新」で再分析できます。</p>
+                        </div>
+                    </div>
+                </template>
+
+                <template lwc:if={hasVisibleActions}>
+                    <ol class="list">
+                        <template for:each={visibleActions} for:item="a">
+                            <li key={a.id} class={a.cls} style={a.style}>
+                                <span class="item__rail"></span>
+                                <span class={a.iconCls}>
+                                    <lightning-icon icon-name={a.icon} size="x-small" variant="inverse"></lightning-icon>
+                                </span>
+                                <div class="item__body">
+                                    <div class="item__meta">
+                                        <template lwc:if={a.isTopPick}>
+                                            <span class="chip chip_top">✦ AI おすすめ No.1</span>
+                                        </template>
+                                        <span class={a.priorityCls}>優先度 {a.priorityLabel}</span>
+                                        <span class="chip chip_ghost">{a.category}</span>
+                                        <span class="chip chip_ghost">{a.actionLabel}</span>
+                                    </div>
+
+                                    <h3 class="item__title">{a.title}</h3>
+
+                                    <template lwc:if={a.isOpen}>
+                                        <p class="item__reason">
+                                            <span class="item__why">根拠</span>
+                                            {a.reason}
+                                        </p>
+
+                                        <template lwc:if={a.expanded}>
+                                            <div class="suggest">
+                                                <span class="suggest__label">
+                                                    <lightning-icon icon-name="utility:einstein" size="xx-small" class="suggest__icon"></lightning-icon>
+                                                    AI の推奨アプローチ
+                                                </span>
+                                                <p class="suggest__text">{a.suggestion}</p>
+                                            </div>
+                                        </template>
+
+                                        <div class="facts">
+                                            <span class="fact">
+                                                <lightning-icon icon-name="utility:clock" size="xx-small" class="fact__icon"></lightning-icon>
+                                                {a.dueLabel}（{a.dueRelative}）
+                                            </span>
+                                            <span class="fact">
+                                                確信度
+                                                <span class="meter"><span class="meter__fill" style={a.confidenceStyle}></span></span>
+                                                {a.confidence}%
+                                            </span>
+                                            <template lwc:if={a.relatedId}>
+                                                <button type="button" class="fact fact_link" data-record-id={a.relatedId} onclick={handleNavigate}>
+                                                    <lightning-icon icon-name="utility:link" size="xx-small" class="fact__icon"></lightning-icon>
+                                                    {a.relatedType}: {a.relatedName}
+                                                </button>
+                                            </template>
+                                        </div>
+
+                                        <div class="item__actions">
+                                            <lightning-button
+                                                label={a.createLabel}
+                                                icon-name="utility:add"
+                                                variant="brand"
+                                                data-id={a.id}
+                                                onclick={handleCreateTask}
+                                                disabled={a.saving}
+                                            ></lightning-button>
+                                            <lightning-button
+                                                label="対応済み"
+                                                icon-name="utility:check"
+                                                data-id={a.id}
+                                                onclick={handleDone}
+                                            ></lightning-button>
+                                            <lightning-button
+                                                label={a.toggleLabel}
+                                                icon-name={a.toggleIcon}
+                                                icon-position="right"
+                                                variant="base"
+                                                data-id={a.id}
+                                                onclick={handleToggle}
+                                            ></lightning-button>
+                                            <span class="item__spacer"></span>
+                                            <lightning-button-icon
+                                                icon-name="utility:close"
+                                                variant="bare"
+                                                size="small"
+                                                alternative-text="この提案を見送る"
+                                                title="この提案を見送る"
+                                                data-id={a.id}
+                                                onclick={handleDismiss}
+                                            ></lightning-button-icon>
+                                        </div>
+                                    </template>
+
+                                    <template lwc:else>
+                                        <div class="handled">
+                                            <lightning-icon icon-name={a.statusIcon} size="xx-small" class="handled__icon"></lightning-icon>
+                                            <span>{a.statusLabel}</span>
+                                            <button type="button" class="text-button" data-id={a.id} onclick={handleUndo}>元に戻す</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </li>
+                        </template>
+                    </ol>
+                </template>
+                <template lwc:else>
+                    <p class="empty">この優先度の提案はありません。</p>
+                </template>
+
+                <footer class="footer">
+                    <lightning-icon icon-name="utility:info" size="xx-small"></lightning-icon>
+                    提案は Salesforce 内のデータからデモ用に自動生成されています。
+                </footer>
+            </template>
+        </div>
+    </article>
+</template>
