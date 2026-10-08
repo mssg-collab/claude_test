@@ -14,7 +14,7 @@
   --accent-soft: #e3ebf6;
   --signal: #b5651d;
   --signal-soft: #f7ecdf;
-  --t1: #3b5bdb; --t2: #2b8a6e; --t3: #a3477a; --t4: #c26a14; --t5: #6a4fc4; --t6: #1c7c9c; --t7: #7a6a1f; --t8: #b03a3a;
+  --t1: #3b5bdb; --t2: #2b8a6e; --t3: #a3477a; --t4: #c26a14; --t5: #6a4fc4; --t6: #1c7c9c; --t7: #7a6a1f; --t8: #b03a3a; --t9: #4a6a7a; --t10: #8a4f2a;
   --font-display: "Zen Kaku Gothic Antique", "Hiragino Sans", "Yu Gothic", sans-serif;
   --font-body: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -24,14 +24,14 @@
   :root:not([data-theme="light"]) {
     --bg: #11161d; --surface: #19212b; --ink: #e6ebf1; --muted: #9aa6b4; --line: #2b3542;
     --accent: #7fa7e0; --accent-soft: #1d2a3c; --signal: #e0a062; --signal-soft: #2e2418;
-    --t1: #8ea5ff; --t2: #6cc7a9; --t3: #e08bbb; --t4: #f0a85a; --t5: #b39cf5; --t6: #6ec3df; --t7: #d6c46a; --t8: #f08a8a;
+    --t1: #8ea5ff; --t2: #6cc7a9; --t3: #e08bbb; --t4: #f0a85a; --t5: #b39cf5; --t6: #6ec3df; --t7: #d6c46a; --t8: #f08a8a; --t9: #9fbccb; --t10: #e0a07a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #11161d; --surface: #19212b; --ink: #e6ebf1; --muted: #9aa6b4; --line: #2b3542;
   --accent: #7fa7e0; --accent-soft: #1d2a3c; --signal: #e0a062; --signal-soft: #2e2418;
-  --t1: #8ea5ff; --t2: #6cc7a9; --t3: #e08bbb; --t4: #f0a85a; --t5: #b39cf5; --t6: #6ec3df; --t7: #d6c46a; --t8: #f08a8a;
+  --t1: #8ea5ff; --t2: #6cc7a9; --t3: #e08bbb; --t4: #f0a85a; --t5: #b39cf5; --t6: #6ec3df; --t7: #d6c46a; --t8: #f08a8a; --t9: #9fbccb; --t10: #e0a07a;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -143,7 +143,7 @@ footer { font-size: 12px; color: var(--muted); }
   <main id="content" class="wrap" style="padding:0">
     <div class="empty">
       <strong>今朝のブリーフを読み込んでいます</strong>
-      <span>毎朝 7:00 に AI・コンサルティング・チェンジマネジメント・CRM・CX・デジタルマーケティングの最新動向がここに並びます。</span>
+      <span>毎朝 7:00 に、トピック設定で選んだ分野（AI・コンサルティング・CRM・CX・経済・株式・セキュリティなど）の最新動向がここに並びます。</span>
     </div>
   </main>
 
@@ -158,9 +158,12 @@ footer { font-size: 12px; color: var(--muted); }
     { name: "チェンジマネジメント", focus: "DX定着化, 組織変革, AI時代の人材・リスキリング" },
     { name: "CRM", focus: "Salesforce, Microsoft Dynamics, HubSpot, SAP, CRMのAI機能" },
     { name: "CX", focus: "顧客体験, コンタクトセンター, VoC, パーソナライゼーション" },
-    { name: "デジタルマーケティング", focus: "MA, CDP, 広告・Cookie規制, 生成AI活用マーケティング" }
+    { name: "デジタルマーケティング", focus: "MA, CDP, 広告・Cookie規制, 生成AI活用マーケティング" },
+    { name: "経済動向", focus: "日米の金融政策（日銀・FRB）, 為替, 景気指標, 企業のIT投資動向" },
+    { name: "日本株・米国株", focus: "日経平均・TOPIX, S&P500・NASDAQ, 主要IT・コンサル関連銘柄, 決算" },
+    { name: "セキュリティ", focus: "重大な脆弱性・サイバー攻撃事例, ランサムウェア, AIセキュリティ, ゼロトラスト, セキュリティ規制・ガイドライン（NISC・経産省・NIST）" }
   ];
-  const TOPIC_COLORS = ["--t1", "--t2", "--t3", "--t4", "--t5", "--t6", "--t7", "--t8"];
+  const TOPIC_COLORS = ["--t1", "--t2", "--t3", "--t4", "--t5", "--t6", "--t7", "--t8", "--t9", "--t10"];
 
   const $ = (id) => document.getElementById(id);
   const state = { dates: [], briefs: new Map(), selectedDate: null, topic: "all", q: "", topics: DEFAULT_TOPICS, read: loadRead() };
